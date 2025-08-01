@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                // Modern JS features
+    "module": "commonjs",              // Node's default module system
+    "rootDir": "./src",                // Your TS source files
+    "outDir": "./dist",                // Where compiled JS goes
+    "esModuleInterop": true,           // Allows default imports for CommonJS
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,                    // Enables strict type checking
+    "skipLibCheck": true,              // Speeds up build by skipping type checks on node_modules
+    "types": ["node"]                  // Enables Node globals like `__dirname`
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "**/*.js"]
+}
