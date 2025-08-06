@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
 export function getHome(req: Request, res: Response): void {
-  res.send("Hello from Express!");
+  res.send('Hello from Express!');
 }

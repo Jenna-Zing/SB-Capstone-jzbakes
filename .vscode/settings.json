@@ -1,0 +1,11 @@
+{
+  "editor.formatOnSave": true,  // Automatically formats files on save using Prettier
+  "editor.defaultFormatter": "esbenp.prettier-vscode",  // Ensures Prettier is used instead of ESLint or built-in tools
+  "files.eol": "\n",  // Forces Unix-style line endings across all files
+  "[typescript]": {  // Applies Prettier formatting for TypeScript files
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {  // Applies Prettier formatting for JavaScript files
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
