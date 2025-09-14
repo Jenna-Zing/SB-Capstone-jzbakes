@@ -1,6 +1,3 @@
 node_modules
 dist
 .env
-
-# it keeps adding server/dist/* even though the dist folder is already ignored
-server/dist/*

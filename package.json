@@ -1,13 +1,19 @@
 {
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.1.0",
     "@types/pg": "^8.15.5",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
@@ -25,7 +31,7 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "start": "node dist/app.js",
-    "dev": "concurrently \"npm run watch\" \"nodemon dist/app.js\"",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "lint": "eslint src/**/*.{ts,js}",
     "lint:fix": "eslint src/**/*.{ts,js} --fix",
     "format": "prettier --write src/**/*.{ts,js,json,md}"
