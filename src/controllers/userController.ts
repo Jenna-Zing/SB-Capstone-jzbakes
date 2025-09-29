@@ -66,7 +66,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
   try {
     const result = await pool.query(
-      `SELECT * FROM "${tableName}" WHERE username = $1`,
+      `SELECT username, email, first_name, last_name, password FROM "${tableName}" WHERE username = $1`,
       [username]
     );
     const user = result.rows[0];
@@ -96,7 +96,13 @@ export const loginUser = async (req: Request, res: Response) => {
 
     res.json({
       message: 'Logged in',
-      user: { id: user.id, email: user.email },
+      user: {
+        username: user.username,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        accessToken: token,
+      },
     });
   } catch (err) {
     console.error(err);
@@ -105,9 +111,15 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 export const logoutUser = (req: Request, res: Response) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    sameSite: 'lax',
-  });
-  res.json({ message: 'Logged out' });
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 0, // set maxAge to 0 to immediately expire the cookie
+    });
+    res.json({ message: 'Logged out' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error logging out' });
+  }
 };
