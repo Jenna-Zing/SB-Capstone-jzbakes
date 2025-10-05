@@ -4,21 +4,6 @@ import { hashPassword, comparePasswords, generateToken } from '../utils/auth';
 
 const tableName = 'user';
 
-export const getUsers = (req: Request, res: Response) => {
-  res.json([
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-  ]);
-};
-
-/* export const createUser = (req: Request, res: Response) => {
-  const newUser = req.body; // TODO: how do you define and get this data?
-  res.status(201).json({
-    message: 'User created',
-    user: newUser,
-  });
-}; */
-
 export const createUser = async (req: Request, res: Response) => {
   const { firstName, lastName, phoneNumber, email, username, password } =
     req.body;
@@ -41,23 +26,15 @@ export const createUser = async (req: Request, res: Response) => {
       [firstName, lastName, phoneNumber, email, username, hashed]
     );
 
-    const token = generateToken({
-      id: newUser.rows[0].id,
-      email: newUser.rows[0].email,
-      username: newUser.rows[0].username,
+    res.status(201).json({
+      message: 'User was successfully created',
+      user: newUser.rows[0],
     });
-
-    // Set token in cookie (HttpOnly for security)
-    res.cookie('token', token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 1000, // 1 hour
-    });
-
-    res.status(201).json({ message: 'User created', user: newUser.rows[0] });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Sign up error' });
+    res.status(500).json({
+      message: 'An unexpected error occurred. Please try again later.',
+    });
   }
 };
 
@@ -66,19 +43,21 @@ export const loginUser = async (req: Request, res: Response) => {
 
   try {
     const result = await pool.query(
-      `SELECT username, email, first_name, last_name, password FROM "${tableName}" WHERE username = $1`,
+      `SELECT id, username, email, first_name, last_name, password FROM "${tableName}" WHERE username = $1`,
       [username]
     );
     const user = result.rows[0];
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.error('User not found with username: ', username);
+      return res.status(400).json({ message: 'Invalid username or password' });
     }
 
     // Compare passwords
     const isValid = await comparePasswords(password, user.password);
     if (!isValid) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.error(`Invalid password (${password}) for user: ${username}`);
+      return res.status(400).json({ message: 'Invalid username or password' });
     }
 
     // Generate JWT
@@ -94,8 +73,8 @@ export const loginUser = async (req: Request, res: Response) => {
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
-    res.json({
-      message: 'Logged in',
+    res.status(200).json({
+      message: 'Successful Login',
       user: {
         username: user.username,
         firstName: user.first_name,
@@ -106,7 +85,9 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Login error' });
+    res.status(500).json({
+      message: 'An unexpected error occurred. Please try again later.',
+    });
   }
 };
 
@@ -117,9 +98,11 @@ export const logoutUser = (req: Request, res: Response) => {
       sameSite: 'lax',
       maxAge: 0, // set maxAge to 0 to immediately expire the cookie
     });
-    res.json({ message: 'Logged out' });
+    res.status(200).json({ message: 'Successful Logout' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error logging out' });
+    res.status(500).json({
+      message: 'An unexpected error occurred. Please try again later.',
+    });
   }
 };
