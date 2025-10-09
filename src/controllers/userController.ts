@@ -1,8 +1,77 @@
 import { Request, Response } from 'express';
 import pool from '../db';
-import { hashPassword, comparePasswords, generateToken } from '../utils/auth';
+import {
+  hashPassword,
+  comparePasswords,
+  verifyToken,
+  generateToken,
+} from '../utils/auth';
 
 const tableName = 'user';
+
+export const getCurrentUser = async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(200).json(null); // No user logged in
+      // return res.status(100).json({ message: 'Not logged in' });
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded || !decoded.username) {
+      return res.status(200).json(null); // invalid/expired token
+      // return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+
+    const result = await pool.query(
+      `SELECT id, username, email, first_name, last_name FROM "${tableName}" WHERE username = $1`,
+      [decoded.username]
+    );
+
+    const user = result.rows[0];
+    if (!user) {
+      return res.status(200).json(null); // user not found
+      // return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Validate the user fields
+    const isValidUser = validateUserFields(user);
+    if (!isValidUser) {
+      return res.status(200).json(null); // Invalid user data
+    }
+
+    // return the valid user data from their session cookie
+    res.status(200).json({
+      username: user.username,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      isLoggedIn: true,
+    });
+  } catch (err) {
+    console.error('Session restore error:', err);
+    res.status(500).json({ message: 'Server error during session restore' });
+  }
+};
+
+// Validate user fields to ensure they are not null, undefined, or empty
+const validateUserFields = (user: {
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+}) => {
+  return (
+    user.username &&
+    user.first_name &&
+    user.last_name &&
+    user.email &&
+    user.username.trim() !== '' &&
+    user.first_name.trim() !== '' &&
+    user.last_name.trim() !== '' &&
+    user.email.trim() !== ''
+  );
+};
 
 export const createUser = async (req: Request, res: Response) => {
   const { firstName, lastName, phoneNumber, email, username, password } =

@@ -11,9 +11,11 @@ export const generateToken = (payload: object): string => {
 // Checks if a given token is valid and untampered. Returns decoded data if valid, else null.
 export const verifyToken = (token: string): any => {
   try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (err) {
-    return null;
+    const decoded = jwt.verify(token, JWT_SECRET); // JWT_SECRET must match what was used to sign the token
+    return decoded; // This is the payload (e.g., { username: "john_doe", iat: ..., exp: ... })
+  } catch (error) {
+    console.error('Invalid or expired token:', error.message);
+    return null; // Token is invalid or expired
   }
 };
 
