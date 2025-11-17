@@ -46,7 +46,6 @@ export const getCurrentUser = async (req: Request, res: Response) => {
       firstName: user.first_name,
       lastName: user.last_name,
       email: user.email,
-      isLoggedIn: true,
     });
   } catch (err) {
     console.error('Session restore error:', err);
