@@ -12,8 +12,10 @@ import usersRoutes from './routes/users';
 import ordersRoutes from './routes/orders';
 import productsRoutes from './routes/products';
 import orderItemsRoutes from './routes/orderItems';
+import stripeRoutes from './routes/stripe';
 
-const app = express(); // creates an instance of an Express app
+const app = express(); // creates Fan instance of an Express app
+app.use(express.static('public')); // for Stripe
 
 app.use(
   cors({
@@ -30,6 +32,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/orderItems', orderItemsRoutes);
+app.use('/api/stripe', stripeRoutes);
 
 const PORT = process.env.PORT || 8080; // sets a port number - use special port number from env file var; if not, defaults to 5173
 
