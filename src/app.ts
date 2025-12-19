@@ -13,6 +13,7 @@ import ordersRoutes from './routes/orders';
 import productsRoutes from './routes/products';
 import orderItemsRoutes from './routes/orderItems';
 import stripeRoutes from './routes/stripe';
+import { handleWebhook } from './controllers/stripeController';
 
 const app = express(); // creates Fan instance of an Express app
 app.use(express.static('public')); // for Stripe
@@ -24,6 +25,13 @@ app.use(
   })
 ); // enables CORS so your server can accept requests from different origins (e.g. React FE app which runs on port 5173, while this BE server runs on port 8080)
 app.use(cors());
+
+app.post(
+  'api/stripe/webhook',
+  express.raw({ type: 'application/json' }),
+  handleWebhook
+);
+
 app.use(express.json()); // Built-in Express middleware that lets you read JSON data from incoming requests (e.g. POST requests with JSON bodies).
 app.use(cookieParser()); // enables cookie parsing so you can read cookies from incoming requests
 
