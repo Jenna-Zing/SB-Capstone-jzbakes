@@ -54,19 +54,25 @@ export const handleWebhook = async (req: Request, res: Response) => {
       const paymentIntent = event.data.object;
 
       // Save to your database
-      await pool.query(
-        `INSERT INTO stripePayments 
-        (stripe_payment_intent_id, amount, currency, status, customer_email, created_at) 
-        VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          paymentIntent.id,
-          paymentIntent.amount,
-          paymentIntent.currency,
-          'succeeded',
-          paymentIntent.receipt_email,
-          new Date(paymentIntent.created * 1000),
-        ]
-      );
+      try {
+        await pool.query(
+          `INSERT INTO stripePayments 
+          (stripe_payment_intent_id, amount, currency, status, customer_email, created_at) 
+          VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            paymentIntent.id,
+            paymentIntent.amount,
+            paymentIntent.currency,
+            'succeeded',
+            paymentIntent.receipt_email,
+            new Date(paymentIntent.created * 1000),
+          ]
+        );
+      } catch (dbError: any) {
+        console.error("Error saving to database:", dbError.message);
+        // We still want to return 200 to Stripe so it doesn't retry, 
+        // but we should log this critical failure.
+      }
       // await db.transactions.create({
       //   stripe_payment_intent_id: paymentIntent.id,
       //   amount: paymentIntent.amount,
