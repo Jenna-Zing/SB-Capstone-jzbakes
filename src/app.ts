@@ -23,6 +23,7 @@ app.use(
     credentials: true, // allows credentials (cookies) to be sent along with requests
   })
 ); // enables CORS so your server can accept requests from different origins (e.g. React FE app which runs on port 5173, while this BE server runs on port 8080)
+app.use(cors());
 app.use(express.json()); // Built-in Express middleware that lets you read JSON data from incoming requests (e.g. POST requests with JSON bodies).
 app.use(cookieParser()); // enables cookie parsing so you can read cookies from incoming requests
 
